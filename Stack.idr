@@ -7,8 +7,6 @@ import Effect.Random
 import Effect.State
 import Effect.StdIO
 
-%default total
-
 
 --------------------------------
 -- Stack Language Interpreter --
