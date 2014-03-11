@@ -1,0 +1,8 @@
+package IdrisDemo
+
+opts = "-p neweffects"
+
+modules =
+  Demo.Intro,
+  Demo.Stack,
+  Demo.Game
