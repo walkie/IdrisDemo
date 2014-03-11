@@ -119,11 +119,18 @@ using (mvs : MoveTypes np)
   pure i m = const m
 
   -- Get the last move played by the indicated player.
-  -- (Interactive proof.)
   lastMove : (i : Fin np) -> Transcript mvs -> Maybe (index i mvs)
+
+  -- Want to write something like the following,
+  -- but the types aren't right... See why?
+  --
   -- lastMove i (Move j m :: t) = if i == j then Just m else lastMove i t
- 
-  
+  -- 
+  -- Instead, try to find a proof that i and j are equal.
+  -- Idris needs our help to type check the Yes case.
+  -- ?= means that we will provide a proof that the type is correct.
+  -- The proof at the bottom of the file was constructed interactively
+  -- in the Idris REPL.
   lastMove i (Move j m :: t) with (decEq i j)
     | Yes p ?= Just m
     | No  _  = lastMove i t
@@ -135,22 +142,32 @@ using (mvs : MoveTypes np)
 -- Some example strategies for our games
 --
 
+-- PD strategy for either player:
+-- Cooperate on the first move, then do whatever the opponent did in the
+-- previous iteration.
 titForTat : (i : Fin 2) -> Strategy Dilemma i
 titForTat (fZ)         t = fromMaybe True (lastMove 1 t)
 titForTat (fS fZ)      t = fromMaybe True (lastMove 0 t)
 titForTat (fS (fS fZ)) _ impossible
 
+-- PD strategy for either player:
+-- Alternate between cooperation and defection.
 alternate : (i : Fin 2) -> Bool -> Strategy Dilemma i
 alternate (fZ)         x t = maybe x not (lastMove 0 t)
 alternate (fS fZ)      x t = maybe x not (lastMove 1 t)
 alternate (fS (fS fZ)) _ _ impossible
 
+-- Ultimatum strategy for first player:
+-- Play the `from` bid in the first iteration, then increase bid by `step`
+-- in each subsequent game.
 increase : Fin 101 -> Nat -> Strategy Ultimatum 0
 increase from step t = maybe from (inc step) (lastMove 0 t)
   where
     inc : Nat -> Fin 101 -> Fin 101
     inc s m = fromMaybe maxBound (natToFin (s + finToNat m) 101)
 
+-- Ultimatum strategy for second player:
+-- Accept the bid if it is below a certain threshold.
 threshold : Fin 101 -> Strategy Ultimatum 1
 threshold x t = maybe True (\m => (finToNat m <= finToNat x)) (lastMove 0 t)
 
@@ -179,12 +196,21 @@ score Z     _         = replicate _ 0
 score (S n) (p :: ps) = zipWith (+) p (score n ps)
 
 
+-- Examples from Idris REPL:
+--
+-- > take 4 (play dilemma (titForTat 0) (alternate 1 True) [])
+-- [[2, 2], [0, 3], [3, 0], [0, 3]] : Vect 4 (Vect 2 Integer)
+--
+-- > take 4 (play ultimatum (increase 15 20) (threshold 60) [])
+-- [[15, 85], [35, 65], [55, 45], [0, 0]] : Vect 4 (Vect 2 Integer)
+--
+-- > score 100 (play dilemma (titForTat 0) (titForTat 1) [])
+-- [200, 200] : Vect 2 Integer
+
 
 ---------- Proofs ----------
 
-{-
 Main.lastMove_lemma_1 = proof
   intros
   rewrite (sym p)
   trivial
--}
