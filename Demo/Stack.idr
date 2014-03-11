@@ -1,4 +1,4 @@
-module Stack
+module Demo.Stack
 
 import Data.HVect
 

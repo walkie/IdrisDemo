@@ -1,3 +1,5 @@
+module Demo.Intro
+
 %hide Prelude.Bool.Bool
 %hide Prelude.Bool.boolElim
 %hide Prelude.List.List

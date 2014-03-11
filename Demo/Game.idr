@@ -1,3 +1,5 @@
+module Demo.Game
+
 import Data.HVect
 
 %default total
@@ -210,7 +212,7 @@ score (S n) (p :: ps) = zipWith (+) p (score n ps)
 
 ---------- Proofs ----------
 
-Main.lastMove_lemma_1 = proof
+Demo.Game.lastMove_lemma_1 = proof
   intros
   rewrite (sym p)
   trivial
