@@ -1,6 +1,6 @@
 package IdrisDemo
 
-opts = "-p neweffects"
+opts = "-p effects"
 
 modules =
   Demo.Intro,
